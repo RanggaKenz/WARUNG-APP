@@ -1,17 +1,12 @@
-// components/Sidebar.tsx
 'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
-  LayoutDashboard,
-  Wallet,
-  Package,
-  TrendingUp,
-  Menu,
-  X,
-  Store
+  LayoutDashboard, Wallet,
+  Package, TrendingUp,
+  Menu, X, Store
 } from 'lucide-react'
 
 const navItems = [
@@ -21,11 +16,16 @@ const navItems = [
   { href: '/penghasilan',  label: 'Penghasilan', icon: TrendingUp },
 ]
 
-export default function Sidebar() {
-  const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
+// ── NavLinks dipindah ke LUAR Sidebar ─────────────
+// setMobileOpen dikirim lewat props, bukan lewat closure
+interface NavLinksProps {
+  onNavigate: () => void
+}
 
-  const NavLinks = () => (
+function NavLinks({ onNavigate }: NavLinksProps) {
+  const pathname = usePathname()
+
+  return (
     <nav className="flex flex-col gap-1 mt-6">
       {navItems.map(({ href, label, icon: Icon }) => {
         const active = pathname === href
@@ -33,7 +33,7 @@ export default function Sidebar() {
           <Link
             key={href}
             href={href}
-            onClick={() => setMobileOpen(false)}
+            onClick={onNavigate}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
               ${active
                 ? 'bg-emerald-500 text-white'
@@ -47,6 +47,11 @@ export default function Sidebar() {
       })}
     </nav>
   )
+}
+
+// ── Sidebar ───────────────────────────────────────
+export default function Sidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <>
@@ -56,7 +61,7 @@ export default function Sidebar() {
           <Store size={22} className="text-emerald-500" />
           <span className="font-semibold text-gray-800">Warung App</span>
         </div>
-        
+        <NavLinks onNavigate={() => setMobileOpen(false)} />
       </aside>
 
       {/* Mobile top bar */}
@@ -87,12 +92,12 @@ export default function Sidebar() {
                 <X size={20} className="text-gray-500" />
               </button>
             </div>
-            
+            <NavLinks onNavigate={() => setMobileOpen(false)} />
           </div>
         </div>
       )}
 
-      {/* Spacer for mobile top bar */}
+      {/* Spacer mobile */}
       <div className="md:hidden h-14 flex-shrink-0" />
     </>
   )
